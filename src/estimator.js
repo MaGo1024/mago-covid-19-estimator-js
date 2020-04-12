@@ -1,4 +1,4 @@
- const covid19ImpactEstimator = (data) => {
+const covid19ImpactEstimator = (data) => {
   const currentlyInfected = (rate) => (data.reportedCases * rate);
   const impact = {
     currentlyInfected: Math.round(currentlyInfected(10)),
