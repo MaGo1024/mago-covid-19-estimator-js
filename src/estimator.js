@@ -1,41 +1,30 @@
-data = {
-  region: {
-    name: "Africa",
-    avgAge: 19.7,
-    avgDailyIncomeInUSD: 5,
-    avgDailyIncomePopulation: 0.71
-  },
-  periodType: "days",
-  timeToElapse: 58,
-  reportedCases: 674,
-  population: 66622705,
-  totalHospitalBeds: 1380614
-};
-
 const covid19ImpactEstimator = (data) => {
-  const currentlyInfected = (rate) => (data.reportedCases * rate);
-  const impact = {
-    currentlyInfected: Math.round(currentlyInfected(10)),
-    infectionsByRequestedTime: Math.round(currentlyInfected(10) * 512),
-    severeCasesByRequestedTime: Math.round(currentlyInfected(10) * 512 * 0.15),
-    hospitalBedsByRequestedTime: Math.round((data.totalHospitalBeds * 0.35) - (currentlyInfected(10) * 512 * 0.15)),
-    casesForICUByRequestedTime: Math.round(currentlyInfected(10) * 512 * 0.05),
-    casesForVentilatorsByRequestedTime: Math.round(currentlyInfected(10) * 512 * 0.02),
-    dollarsInFlight: (currentlyInfected(10) * 512 * 0.65 * 1.5 * 30).toFixed(2)
+  const impactEstimate = (rate) => {
+    const currentlyInfected = Math.round(data.reportedCases * rate);
+    const infectionsByRequestedTime = Math.round(currentlyInfected * 512);
+    const severeCasesByRequestedTime = Math.round(infectionsByRequestedTime * 0.15);
+    const availableBedsByRequestedTime = Math.round(data.totalHospitalBeds * 0.35);
+    const hospitalBedsByRequestedTime = availableBedsByRequestedTime - severeCasesByRequestedTime;
+    const casesForICUByRequestedTime = Math.round(currentlyInfected * 0.05);
+    const casesForVentilatorsByRequestedTime = Math.round(currentlyInfected * 0.02);
+    const dollarsRate = 0.65 * 1.5 * 30;
+    const dollarsInFlight = (currentlyInfected * dollarsRate).toFixed(2);
+    const estimateData = {
+      currentlyInfected,
+      infectionsByRequestedTime,
+      severeCasesByRequestedTime,
+      hospitalBedsByRequestedTime,
+      casesForICUByRequestedTime,
+      casesForVentilatorsByRequestedTime,
+      dollarsInFlight
+    };
+    return estimateData;
+  };
+  const estimate = {
+    impact: impactEstimate(10),
+    severeImpact: impactEstimate(50)
   };
 
-  const severeImpact = {
-    currentlyInfected: Math.round(currentlyInfected(50)),
-    infectionsByRequestedTime: Math.round(currentlyInfected(50) * 512),
-    severeCasesByRequestedTime: Math.round(currentlyInfected(50) * 512 * 0.15),
-    hospitalBedsByRequestedTime: Math.round((data.totalHospitalBeds * 0.35) - (currentlyInfected(50) * 512 * 0.15)),
-    casesForICUByRequestedTime: Math.round(currentlyInfected(10) * 512 * 0.05),
-    casesForVentilatorsByRequestedTime: Math.round(currentlyInfected(10) * 512 * 0.02),
-    dollarsInFlight: (currentlyInfected(10) * 512 * 0.65 * 1.5 * 30).toFixed(2)
-  };
-
-  return {data, impact, severeImpact}
-
+  return { estimate };
 };
-
 export default covid19ImpactEstimator;
